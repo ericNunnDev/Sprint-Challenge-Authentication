@@ -13,6 +13,7 @@ module.exports = server => {
   server.get('/api/jokes', authenticate, getJokes);
 };
 
+// Functional === Spits out JWT when password is entered in endpoint === 
 function register(req, res) {
   let user = req.body;
   const hash = bcrypt.hashSync(user.password, 10);
@@ -25,6 +26,7 @@ function register(req, res) {
   .catch(e => res.status(500).json(e));
 }
 
+// Functional === Welcomes user and returns token === 
 function login (req, res) {
   let { username, password} = req.body;
 
