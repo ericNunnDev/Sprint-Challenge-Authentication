@@ -1,6 +1,9 @@
 const router = require('express').Router();
 const axios = require('axios');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const secret = require('./secret')
 const db = require('./model');
 const { authenticate } = require('../auth/authenticate');
 
@@ -9,10 +12,6 @@ module.exports = server => {
   server.post('/api/login', login);
   server.get('/api/jokes', authenticate, getJokes);
 };
-
-router.get('/jokes', authenticate, (req, res) => {
-
-});
 
 function register(req, res) {
   let user = req.body;
@@ -33,12 +32,24 @@ function login (req, res) {
   .first()
   .then(user => {
     if(user && bcrypt.compareSync(password, user.password)) {
-      res.status(200).json({ message: `Welcome ${user.username}!` });
+      const token = getToken(user);
+      res.status(200).json({ message: `Welcome ${user.username}!`, token, });
     } else {
       res.status(401).json({ message: 'Invalid username or password.' })
     }
   })
   .catch(e => res.status(500).json(e));
+}
+
+function getToken(user) {
+  const jwtPayload = {
+    username: user.username,
+    password: user.password,
+  };
+  const jwtOptions = {
+    expiresIn: '1d',
+  };
+  return jwt.sign(jwtPayload, secret.jwtSecret , jwtOptions)
 }
 
 function getJokes(req, res) {
