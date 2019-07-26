@@ -1,4 +1,3 @@
-const router = require('express').Router();
 const axios = require('axios');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -28,7 +27,7 @@ function register(req, res) {
 
 // Functional === Welcomes user and returns token === 
 function login (req, res) {
-  let { username, password} = req.body;
+  let { username, password } = req.body;
 
   db.findBy({ username })
   .first()
@@ -43,17 +42,19 @@ function login (req, res) {
   .catch(e => res.status(500).json(e));
 }
 
+// Have to assume this works since token is generating 
 function getToken(user) {
-  const jwtPayload = {
+  const payload = {
     username: user.username,
     password: user.password,
   };
-  const jwtOptions = {
+  const options = {
     expiresIn: '1d',
   };
-  return jwt.sign(jwtPayload, secret.jwtSecret , jwtOptions)
+  return jwt.sign(payload, secret.jwtSecret , options)
 }
 
+// Adding something to the headers maybe? 
 function getJokes(req, res) {
   const requestOptions = {
     headers: { accept: 'application/json' },
